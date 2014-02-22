@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
  
     // Create a hello world window object
     calculator example;
- 	example.run();
+ 	  example.run();
  	
     // gtkmm main loop
     Gtk::Main::run(example);
