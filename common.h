@@ -38,7 +38,7 @@
 #include<stdexcept>
 #include<system_error>
 
-
+using namespace std::chrono;
 
 template<typename T>
 void display(const T& val)
@@ -62,3 +62,23 @@ void basicsdisplay(const T& val)
 	std::cout<<val;
 }
 
+
+
+
+
+ // Generic class for tracing the function call
+ class functionlogging 
+{
+ 	private:
+        std::string name;
+        static std::string in;
+        static std::string out;
+ 	public:
+ 	functionlogging(std::string);
+ 	~functionlogging();
+};
+
+
+//Define MACRO for easy use for end user.
+#define LOG_ENTRY_EXIT_FOR(x)       functionlogging  SomeLongNameThatIsNotLikelyToBeUsedInTheFunctionlogger(x)
+#define LOG_ENTRY_EXIT              LOG_ENTRY_EXIT_FOR(__func__)
