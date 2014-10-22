@@ -1,5 +1,34 @@
 #include"common.h"
 
+class director
+{
+public:
+	virtual ~director() = default;
+
+   // virtual void ShowDialog();
+	virtual void WidgetChanged(Gtk::Widget*) = 0;
+	virtual void GetWidgets(Gtk::Widget*) = 0;
+protected:
+	director() {}
+};
+
+
+class Updatedirector: public director
+{
+public:
+	Updatedirector() = default;
+	virtual ~Updatedirector() = default;
+
+	virtual void WidgetChanged(Gtk::Widget*);
+	virtual void GetWidgets(Gtk::Widget* );
+private:
+	std::vector<Gtk::Widget*> _widgetcolletion;
+};
+
+
+
+
+
 
 class button: public Gtk::Button
 {
@@ -7,9 +36,11 @@ class button: public Gtk::Button
     button();
     virtual ~button() = default;
     void set_name_button(std::string);
- 
+	 void set_director(director*); 
   protected:
     void on_button_clicked();
+  private:
+	 director* _director{nullptr};
  };
 
 
@@ -19,19 +50,23 @@ class entry: public Gtk::Entry
 public:
 	entry();
 	virtual ~entry() = default;
-	
+	void set_name_entry(std::string);
+	void set_director(director*);
 protected:
-	void on_button_close();	
+	void on_button_close();
+private:
+	director* _director{nullptr};	
 };
 
 
 
-struct rowpack
+
+class rowpack
 {
 public:
 	rowpack();
 	~rowpack()= default;
-	void intialize(std::vector<std::string>& );
+	void intialize(std::vector<std::string>&,director*);
 
 	button 				  		m_one;
 	Gtk::Separator   s_one {Gtk::ORIENTATION_VERTICAL};
@@ -57,15 +92,15 @@ class calculator : public Gtk::Window
 {
 public:
 	calculator();
-	virtual ~calculator()= default;
+	virtual ~calculator();
 	void run(void);
-		
+
 private:
 	// the main container objects to hold all above rowpack objects into a column
-	Gtk::Box    			column_object {Gtk::ORIENTATION_VERTICAL};
+	Gtk::Box    		column_object {Gtk::ORIENTATION_VERTICAL};
 	
 	entry					displ_area;
-	Gtk::Separator     displ_sep;
+	Gtk::Separator    displ_sep;
 	
 	rowpack    			first_robject;
 	Gtk::Separator		first_sep;
@@ -77,6 +112,8 @@ private:
 	Gtk::Separator		third_sep;
 	
 	rowpack	 			fourth_robject;
-	
+
+	director*         gdirector;
 };
+
 
