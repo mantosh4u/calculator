@@ -5,7 +5,6 @@ class director
 public:
 	virtual ~director() = default;
 
-   // virtual void ShowDialog();
 	virtual void WidgetChanged(Gtk::Widget*) = 0;
 	virtual void GetWidgets(Gtk::Widget*) = 0;
 protected:
@@ -23,6 +22,10 @@ public:
 	virtual void GetWidgets(Gtk::Widget* );
 private:
 	std::vector<Gtk::Widget*> _widgetcolletion;
+	Gtk::Widget*  				  _entrySection{nullptr};
+	Gtk::Widget*              _equalButton{nullptr};
+	std::string               _expression{};
+   std::string               _output{};
 };
 
 
@@ -55,9 +58,8 @@ public:
 protected:
 	void on_button_close();
 private:
-	director* _director{nullptr};	
+	director*    _director{nullptr};	
 };
-
 
 
 
@@ -83,8 +85,6 @@ public:
 	// main container object to hold all above objects of a row
 	Gtk::Box	 		row_object;
 };
-
-
 
 
 
@@ -115,5 +115,3 @@ private:
 
 	director*         gdirector;
 };
-
-
