@@ -1,17 +1,74 @@
 #include"widget.h"
+#include"expression.h"
+
+//To find out whether items are in the composite objects
+class Name_Equal {
+private:
+    std::string val;
+public:
+    Name_Equal(const std::string& v) :val(v) { }
+    bool operator()(Gtk::Widget* x) const { 
+        return (x->get_name() == val); 
+    }
+};
+
+
 
 /*************************************************************************************************/
 void Updatedirector::WidgetChanged(Gtk::Widget* w) 
 {
 		std::string name = w->get_name();
-		name += " :Changed Events";
-		display(name);
+
+		 //Check whether "=" widgets is cached or not.
+			if(_equalButton == nullptr)
+			{
+				Name_Equal equal(std::string{"="}); 
+				auto itrpos = std::find_if(std::begin(_widgetcolletion), std::end(_widgetcolletion),equal);
+				if (itrpos != std::end(_widgetcolletion)) {
+   				_equalButton = *itrpos;
+				} 
+			}
+			
+			// Check Whether "OutputDisplay" widgets is cached or not
+			if(_entrySection == nullptr)
+			{
+				Name_Equal entry(std::string{"OutputDisplay"});
+				auto itrpos = std::find_if(std::begin(_widgetcolletion), std::end(_widgetcolletion), entry);	
+				if(itrpos != std::end(_widgetcolletion)) {
+					_entrySection = *itrpos;				
+				}
+			}			
+	
+
+		// For time being I think there should be only two cases One when user presses oher 
+      // than = button and Second is of course = button.		
+		
+		if((_entrySection != nullptr)&&(_equalButton != nullptr)) {
+			_expression += name;
+			entry* entryWidget = dynamic_cast<entry*>(_entrySection);
+			if(entryWidget) {			
+				entryWidget->set_text(_expression);
+			}						
+		}
+						
+		if(name.compare("=") == 0)
+		{
+			expression e{_expression};
+			auto output = e.evalute();
+			_output = std::to_string(output);
+			entry* entryWidget = dynamic_cast<entry*>(_entrySection);
+			if(entryWidget) {			
+				entryWidget->set_text(_output);
+			}
+			// Now Reset the expression with the output so that it can be used
+			// in continuation.
+			_expression = _output; 						
+		}
 }
 
 
 void Updatedirector::GetWidgets(Gtk::Widget* w) 
 {
-	 LOG_ENTRY_EXIT;
 	_widgetcolletion.push_back(w);
 }
 
@@ -39,8 +96,6 @@ void button::set_director(director* d)
 
 void button::on_button_clicked(void)
 {
-	// auto tmp2 = property_label();
-
 	// Notify Director that I am changed
    _director->WidgetChanged(this);
 }
@@ -51,6 +106,7 @@ void button::on_button_clicked(void)
 entry::entry()
 {
 	set_size_request(200,100);
+	//signal_clicked().connect(sigc::mem_fun(*this, &entry::on_button_close) );
 }
 
 void entry::set_name_entry(std::string label)
@@ -62,7 +118,9 @@ void entry::set_director(director* d)
 {
    _director = d;
 	_director->GetWidgets(this);
+   _director->WidgetChanged(this);
 }
+
 
 void entry::on_button_close(void)
 {
@@ -167,6 +225,10 @@ void calculator::run(void)
 	column_object.pack_start(displ_area);
 	column_object.pack_start(displ_sep);
 	
+ 	displ_area.set_name_entry("OutputDisplay");
+	// Update this widget information to Updatedirector
+	displ_area.set_director(gdirector);	
+
 	// manage first row object
 	std::vector<std::string> rone_label{ "7", "8", "9", "/", "bksp", "**"};
 	first_robject.intialize(rone_label, gdirector);
@@ -207,4 +269,3 @@ void calculator::run(void)
 	show_all_children();
 
 }
-
